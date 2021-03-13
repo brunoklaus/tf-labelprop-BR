@@ -4,17 +4,11 @@ import os
 import shutil
 import ssl
 import zipfile
-
 import os.path as osp
 import os.path as osp
 from six.moves import urllib
 import tf_labelprop
-from tf_labelprop.input.dataset._mnist import MNIST
-from tf_labelprop.input.dataset._toy_ds import ChapelleDataset, ISOLET
-from tf_labelprop.logging  import logger as LOG
-from tf_labelprop.logging.logger import LogLocation
 from tf_labelprop.settings import INPUT_FOLDER
-
 
 def extract_gz(fpath,fpath_extracted):
     
@@ -160,6 +154,11 @@ class GSSLDataset(object):
             self.process()
         
 
+########################################################################################################
+from tf_labelprop.input.dataset._mnist import MNIST
+from tf_labelprop.input.dataset._toy_ds import ChapelleDataset, ISOLET
+from tf_labelprop.logging  import logger as LOG
+from tf_labelprop.logging.logger import LogLocation
 
 
 
