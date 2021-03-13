@@ -106,7 +106,7 @@ def tex_table(df,y_vars,t_vars,vdiv_vars,hdiv_vars,c_vars,use_std,OUT_FOLDER,dct
             _path = osp.join(*_path)
             tex_table(g_df,y_vars,[],vdiv_vars,hdiv_vars,c_vars,use_std,
                       OUT_FOLDER=_path,
-                      dct_translate=dct_translate,fixed_var_desc=t_vars+fixed_vars,bold_max=bold_max)
+                      dct_translate=dct_translate,fixed_vars=t_vars+fixed_vars,bold_max=bold_max)
     else:
         """
             Base case
