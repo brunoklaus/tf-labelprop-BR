@@ -3,9 +3,10 @@ from inspect import signature, Parameter
 import os
 import shutil
 
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
 import numpy as np
 import os.path as path
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import tf_labelprop.logging.logger as LOG
 import tf_labelprop.output.plots as plots
 

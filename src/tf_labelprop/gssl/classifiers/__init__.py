@@ -1,12 +1,4 @@
 import numpy as np
-from tf_labelprop.gssl.classifiers.clgc import CLGC_Classifier 
-from tf_labelprop.gssl.classifiers.gfhf import GFHF
-from tf_labelprop.gssl.classifiers.gtam import GTAMClassifier
-from  tf_labelprop.gssl.classifiers.lgc import LGCClassifier
-from tf_labelprop.gssl.classifiers.lgc_lvo_auto_d import LGC_LVO_AUTO_D 
-from  tf_labelprop.gssl.classifiers.rf import RandomForest
-from  tf_labelprop.gssl.classifiers.siis import SIISClassifier
-
 
 class GSSLClassifier(object):
     """ Skeleton class for GSSL Classifiers. """
@@ -80,6 +72,14 @@ class GSSLClassifier(object):
 
 
 #from tf_labelprop.gssl.classifiers.lgc_lvo_auto_backup import LGC_LVO_AUTO_D
+
+from tf_labelprop.gssl.classifiers.clgc import CLGC_Classifier 
+from tf_labelprop.gssl.classifiers.gfhf import GFHF
+from tf_labelprop.gssl.classifiers.gtam import GTAMClassifier
+from  tf_labelprop.gssl.classifiers.lgc import LGCClassifier
+from tf_labelprop.gssl.classifiers.lgc_lvo_auto_d import LGC_LVO_AUTO_D 
+from  tf_labelprop.gssl.classifiers.rf import RandomForest
+from  tf_labelprop.gssl.classifiers.siis import SIISClassifier
 
 
 if __name__ == "__main__":

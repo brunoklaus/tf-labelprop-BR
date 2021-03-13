@@ -6,17 +6,17 @@ Module containing utilities for GSSL algorithms.
 
 import warnings
 
+from matplotlib.pyplot import sci
 import scipy.linalg
 import scipy.sparse
 import scipy.sparse.linalg
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
-from matplotlib.pyplot import sci
 import numpy as np
 import pandas as pd
-from sklearn.decomposition import PCA
 import sklearn.manifold as skmf
 import sklearn.model_selection as skmm
-from sklearn.preprocessing import StandardScaler
 
 
 def deg_matrix(W,pwr=1,flat=False, NA_replace_val = 1.0):

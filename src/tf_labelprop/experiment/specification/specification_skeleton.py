@@ -11,9 +11,10 @@ import shutil
 import sys 
 import traceback
 
+import progressbar
+
 import numpy as np
 import pandas as pd
-import progressbar
 from tf_labelprop.experiment.experiments import AFFMAT_PREFIX, GENERAL_PREFIX, ALG_PREFIX, NOISE_PREFIX, INPUT_PREFIX, FILTER_PREFIX, \
     ExperimentRun
 from tf_labelprop.experiment.experiments import TIME_HOOKS

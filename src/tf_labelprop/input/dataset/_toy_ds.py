@@ -1,11 +1,12 @@
 import os
 
-import numpy as np
-import os.path as osp
-import pandas as pd
 import sklearn.model_selection
 import sslbookdata
 from sslbookdata.sslbookdata import load_secstr
+
+import numpy as np
+import os.path as osp
+import pandas as pd
 from tf_labelprop.gssl.graph.gssl_utils import init_matrix
 import tf_labelprop.gssl.graph.gssl_utils as gutils
 from tf_labelprop.input.dataset import GSSLDataset, download_url, extract_zip

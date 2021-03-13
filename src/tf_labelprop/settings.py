@@ -4,11 +4,13 @@ settings.py
 Auxiliary Module that stores the relevant folder paths.
 @author klaus
 """
-import numpy as np
 import os
+
+import scipy.sparse
+
+import numpy as np
 import os.path as path
 from progressbar import ProgressBar, Percentage, Bar, ETA, Timer
-import scipy.sparse
 
 
 def __calculate_root_path():
@@ -18,7 +20,7 @@ def __calculate_root_path():
         root_path = os.path.dirname(root_path)
         i += 1
         if len(root_path) < len("tf_labelprop") or i > 100:
-            raise FileNotFoundError("Could not go up till a directory named EEF_2019 was found")
+            raise FileNotFoundError("Could not go up till a directory named tf_labelprop was found")
     return root_path
 
 #: The path to the root of this python project

@@ -9,11 +9,11 @@ import os
 import shutil
 
 import  scipy.sparse
+from sklearn.decomposition._pca import PCA
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 import numpy as np
 import os.path as path
-from sklearn.decomposition._pca import PCA
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import tf_labelprop.experiment.hooks.hook_skeleton as hk
 import tf_labelprop.logging.logger as LOG
 import tf_labelprop.output.plots as plots

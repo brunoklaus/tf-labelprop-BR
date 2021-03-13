@@ -1,6 +1,7 @@
 
-import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+
+import numpy as np
 from tf_labelprop.gssl.classifiers import GSSLClassifier
 from tf_labelprop.gssl.graph.gssl_utils import init_matrix
 import tf_labelprop.gssl.graph.gssl_utils as gutils
