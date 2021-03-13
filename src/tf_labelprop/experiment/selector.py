@@ -6,9 +6,11 @@ Created on 28 de mar de 2019
 from enum import Enum  
 from inspect import signature 
 from math import sqrt
+
+from sklearn.datasets import make_blobs, make_moons
+
 import numpy as np
 import os.path as path
-from sklearn.datasets import make_blobs, make_moons
 from tf_labelprop.experiment.hooks import hook_skeleton as hks
 from tf_labelprop.experiment.hooks import ldst_filterstats_hook
 from tf_labelprop.experiment.hooks import plot_hooks as plt_hks

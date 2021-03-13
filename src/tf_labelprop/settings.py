@@ -6,11 +6,11 @@ Auxiliary Module that stores the relevant folder paths.
 """
 import os
 
+from progressbar import ProgressBar, Percentage, Bar, ETA, Timer
 import scipy.sparse
 
 import numpy as np
 import os.path as path
-from progressbar import ProgressBar, Percentage, Bar, ETA, Timer
 
 
 def __calculate_root_path():

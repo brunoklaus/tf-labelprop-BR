@@ -8,13 +8,13 @@ from functools import partial
 import os
 import time
 
-import scipy.sparse
-
 import faiss
+import scipy.sparse
+from sklearn.neighbors import NearestNeighbors
+
 import numpy as np
 import os.path as osp
 import scipy.spatial.distance as scipydist
-from sklearn.neighbors import NearestNeighbors
 from tf_labelprop.gssl.graph.gssl_utils import lap_matrix, extract_lap_eigvec
 import tf_labelprop.gssl.graph.gssl_utils as  gutils
 import tf_labelprop.logging.logger as LOG

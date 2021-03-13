@@ -8,9 +8,10 @@ Module related to output and plotting procedures.
 import datetime
 import os
 
+import chart_studio
+import plotly.tools
 import scipy.sparse
 
-import chart_studio
 import chart_studio.plotly as py 
 import igraph as ig
 import numpy as np
@@ -18,7 +19,6 @@ import os.path as path
 import plotly.graph_objs as go
 import plotly.io as pio
 import plotly.offline as pyoff
-import plotly.tools
 import seaborn as sns
 import tf_labelprop.logging.logger as LOG
 from tf_labelprop.output.folders import PLOT_FOLDER

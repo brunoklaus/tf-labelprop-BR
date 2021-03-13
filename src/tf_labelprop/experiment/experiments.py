@@ -45,7 +45,6 @@ def keys_multiplex(args):
     for x,y in _Z:
         mplex[x] = {}
     
-    
     for k,v in args.items():
         for x,y in _Z:
             if k.startswith(y):
@@ -241,7 +240,7 @@ class ExperimentRun():
 def run_debug_example_one(hook_list=[]):
     import tf_labelprop.experiment.specification.exp_chapelle as exp
     
-    opt = exp.ExpChapelle("Digit1").get_all_configs()[0]
+    opt = exp.ExpChapelle("digit1").get_all_configs()[0]
     
     ExperimentRun(opt).run(hook_list=hook_list)
     
@@ -414,7 +413,8 @@ def teste_():
     
     plt.show()
 if __name__ == "__main__":
-    intcomp_demo()
+    run_debug_example_one()
+    #intcomp_demo()
     #teste()
     
 
