@@ -6,7 +6,6 @@ Tutorial (installing dependencies, running and visualizing experiments):
 https://colab.research.google.com/drive/1tszselIxxPoUSWJtAqLY3GPIJ2nOcbAN?usp=sharing
 
 ----------------------------------------------------------------------------------------------
-This w
 
 ACM SAC paper available at:
 https://dl.acm.org/doi/pdf/10.1145/3341105.3374013
