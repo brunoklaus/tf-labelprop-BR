@@ -388,7 +388,7 @@ def teste_():
     plt.show()
     
 if __name__ == "__main__":
-    run_debug_example_one()
+    run_debug_example_one(W_PLOT_HOOKS_NOITER)
     #intcomp_demo()
     #teste()
     
