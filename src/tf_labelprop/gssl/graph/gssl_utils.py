@@ -158,6 +158,8 @@ def split_indices(Y,split_p = 0.5,ensure_one_per_class=True,is_stratified=False,
     b[index_ensure] = True
     
     return b
+
+
 def one_hot(a, num_classes):
     return np.squeeze(np.eye(num_classes)[a.reshape(-1)])
 

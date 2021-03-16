@@ -28,7 +28,6 @@ W_PLOT_HOOKS_NOITER.remove(Hook.FILTER_ITER)
 PLOT_HOOKS_NOITER = list(PLOT_HOOKS)
 PLOT_HOOKS_NOITER.remove(Hook.ALG_ITER)
 
-
 TIME_HOOKS = [Hook.T_ALG,Hook.T_FILTER,Hook.T_NOISE,Hook.T_AFFMAT]                
 
 

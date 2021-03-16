@@ -422,10 +422,6 @@ def color_scale_discrete(Y,palette="bright"):
         raise ""
     Y = Y - np.min(Y) 
     pal = sns.color_palette(palette,np.max(Y)+10)
-    print(pal)
-    pal = [(9.2/100, 35/100, 19/100.0), (45.0/100, 49/100, 52/100)]
-    print(pal[0])
-    print(pal[1])
     #pal = [pal[2],pal[6]]
     res = 255*np.array(list(map(lambda k: (pal[int(k)]),Y)))
 
