@@ -102,7 +102,7 @@ class vertexplotOpt(object):
 
         
 _plot_smol = [484*5,94*5]
-_plot_big = [1920*5,1080*5]
+_plot_big = [1920,1080]
 def plotGraph(X,W,labeledIndexes,vertex_opt,plot_filepath = None, online = False,
               interactive=False,title = "", plot_size = _plot_big, edge_width = 0.5,labeled_only=False):
         """ Plots a GSSL graph.
