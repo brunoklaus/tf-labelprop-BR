@@ -29,7 +29,8 @@ from tf_labelprop.input.noise.noise_process import LabelNoiseProcess
 from tf_labelprop.output.folders import PLOT_FOLDER
 
 
-def select_input(dataset,seed,use_chapelle_splits=False,labeled_percent=None,num_labeled=None,**kwargs):
+def select_input(dataset,seed,use_chapelle_splits=False,labeled_percent=None,num_labeled=None,
+                 ensure_one_per_class=True,is_stratified=False,**kwargs):
     """ Gets the input dataset, according to some specification.
     
     Currently, the following keyword arguments are required:
@@ -103,7 +104,11 @@ def select_input(dataset,seed,use_chapelle_splits=False,labeled_percent=None,num
         
 
         
-        labeledIndexes[_where_known] = gutils.split_indices(ds_y[_where_known,:], labeled_percent,seed)
+        labeledIndexes[_where_known] = gutils.split_indices(ds_y[_where_known,:],
+                                                            split_p=labeled_percent,
+                                                            ensure_one_per_class=ensure_one_per_class,
+                                                            is_stratified=is_stratified,
+                                                            seed=seed)
         print(np.mean(labeledIndexes))
     
     return ds_x.astype(np.float32), _, ds_y.astype(np.float32), labeledIndexes

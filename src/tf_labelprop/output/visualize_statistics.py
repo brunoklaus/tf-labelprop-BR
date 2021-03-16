@@ -321,7 +321,7 @@ def line_plot(df,x_var,y_var,agg_var,p_vars,l_vars, use_std,OUT_FOLDER,dct_trans
             elif isinstance(l_df[x_var].dropna().values[0],str):
                 l_df[x_var] = l_df[x_var].fillna('-')
             
-            l_inst = ';'.join([x+'='+fix_underscore(y) for x,y in sorted(zip(l_vars,l))])
+            l_inst = ';'.join([dct_translate[x]+'='+fix_underscore(y) for x,y in sorted(zip(l_vars,l))])
             print(l_df[x_var].values)
             print(l_df[f'{y_var}_{agg_var}'].values)
             print(fix_underscore(l_inst))

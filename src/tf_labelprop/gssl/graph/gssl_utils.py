@@ -104,16 +104,18 @@ def init_matrix_argmax(Y):
     return(np.argmax(Y,axis=1))
 
 
-def split_indices(Y,split_p = 0.5,seed=None):
+def split_indices(Y,split_p = 0.5,ensure_one_per_class=True,is_stratified=False,seed=None):
     """ Returns a percentage p of indices, using stratification.
     
     Args:
         Y (`NDArray.shape[N]`) : the vector from which to split with stratification w.r.t. each number that appears.
-        split_p (float) : the percentage of stratified indexes to return
+        split_p (float) : Optional. The percentage of stratified indexes to return.
+        ensure_one_per_class (bool): Optional. If ``True`` it is guaranteed that each class will have at least one sample.
+        is_stratified (bool) : Optional. If ``True`` will perform stratification according to class frequencies. Default is ``False``.
         seed (float) : Optional. Used to reproduce results. 
         
     Returns:
-        `NDArray.shape[N*split_p]`: vector with `split_p` of indexes after stratified sampling.
+        `NDArray.shape[N].astype(bool)`: boolean vector with sampled indices.
     
     Raises:
         ValueError: if `split_p` is an invalid percentage.
@@ -126,14 +128,40 @@ def split_indices(Y,split_p = 0.5,seed=None):
     if split_p == 1.0:
         return np.ones((Y.shape[0])).astype(np.bool)
     
-    index_train, _  = skmm.train_test_split(np.arange(Y.shape[0]),
-                                                     stratify=Y,test_size=1-split_p,
+    n, c = Y.shape[0], Y.shape[1]
+    X = np.arange(n)
+    
+    if ensure_one_per_class:
+        index_ensure = []
+        found = np.zeros(c).astype(np.bool)
+        _range = np.arange(n)
+        np.random.seed(seed)
+        np.random.shuffle(_range,)
+        for i in _range:
+            _class = np.argmax(Y[i,:])
+            if not found[_class]:
+                found[_class] = True
+                index_ensure.append(i)
+        
+        not_ensure = np.ones_like(X).astype(np.bool)
+        not_ensure[index_ensure]  = False
+        X = X[not_ensure]
+        Y = Y[not_ensure,:]
+    else:
+        index_ensure = np.array([])
+    
+    index_train, _  = skmm.train_test_split(X,stratify=Y if is_stratified else None,test_size=1-split_p,
                                                      random_state=seed)
     
-    b = np.zeros((Y.shape[0]),dtype=np.bool)
+    b = np.zeros((n),dtype=np.bool)
     b[index_train] = True
+    b[index_ensure] = True
     
     return b
+def one_hot(a, num_classes):
+    return np.squeeze(np.eye(num_classes)[a.reshape(-1)])
+
+
 
 def accuracy_unlabeled(Y_pred,Y_true, labeled_indexes):
     """ Calculates percentage of correct predictions on unlabeled indexes only."""

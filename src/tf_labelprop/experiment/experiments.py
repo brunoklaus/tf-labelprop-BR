@@ -31,7 +31,10 @@ PLOT_HOOKS_NOITER.remove(Hook.ALG_ITER)
 
 TIME_HOOKS = [Hook.T_ALG,Hook.T_FILTER,Hook.T_NOISE,Hook.T_AFFMAT]                
 
-_Z =[("AFFMAT",AFFMAT_PREFIX),
+
+
+def keys_multiplex(args):
+    _Z =[("AFFMAT",AFFMAT_PREFIX),
                 ("INPUT",INPUT_PREFIX),
                 ("FILTER",FILTER_PREFIX),
                 ("NOISE",NOISE_PREFIX),
@@ -39,8 +42,6 @@ _Z =[("AFFMAT",AFFMAT_PREFIX),
                 ("GENERAL",GENERAL_PREFIX)\
                 ]
 
-
-def keys_multiplex(args):
     mplex = {}
     for x,y in _Z:
         mplex[x] = {}
@@ -63,30 +64,6 @@ def postprocess(mplex):
         if k == "ALG" or k == "FILTER":
             continue
         mplex[k]["seed"] = id
-        
-    if False and  "sigma" in mplex["AFFMAT"].keys() and mplex["AFFMAT"]["sigma"] == "mean" and "benchmark" in mplex["INPUT"].keys():
-        """ Just use the RBF's SIGMA directly instead of computing it manually. """
-        
-        if mplex["INPUT"]["benchmark"] == "Digit1":
-            mplex["AFFMAT"]["sigma"]  = 4.412518742145814
-        elif mplex["INPUT"]["benchmark"] == "COIL2":
-            mplex["AFFMAT"]["sigma"]  =  2.4462853134304963
-        elif mplex["INPUT"]["benchmark"] == "COIL":
-            mplex["AFFMAT"]["sigma"]  =  3.0904129359360937
-
-        elif mplex["INPUT"]["benchmark"] == "isolet":
-            mplex["AFFMAT"]["sigma"]  =  2.7529673535028003
-        elif mplex["INPUT"]["benchmark"] == "g241c":
-            mplex["AFFMAT"]["sigma"]  =  6.593260880190159
-        elif mplex["INPUT"]["benchmark"] == "g241n":
-            mplex["AFFMAT"]["sigma"]  =  6.528820377801142
-        elif mplex["INPUT"]["benchmark"] == "USPS":
-            mplex["AFFMAT"]["sigma"]  =  4.412518742145814
-        elif mplex["INPUT"]["benchmark"] == "cifar10":
-            mplex["AFFMAT"]["sigma"]  =  903.6705243483848
-        elif mplex["INPUT"]["benchmark"] == "mnist":
-            mplex["AFFMAT"]["sigma"]  =  423.5704955059233
-        
         
     if "tuning_iter_as_pct" in mplex["FILTER"].keys() and mplex["FILTER"]["tuning_iter_as_pct"]:
         mplex["FILTER"]["tuning_iter"] = mplex["NOISE"]["corruption_level"] *\
@@ -239,9 +216,7 @@ class ExperimentRun():
 
 def run_debug_example_one(hook_list=[]):
     import tf_labelprop.experiment.specification.exp_chapelle as exp
-    
     opt = exp.ExpChapelle("digit1").get_all_configs()[0]
-    
     ExperimentRun(opt).run(hook_list=hook_list)
     
     
@@ -412,6 +387,7 @@ def teste_():
     pcore.plot_all_indexes(X, Y, labeledIndexes=[True]*X.shape[0], W=W,plot_filepath= '/home/klaus/Documents/parana_plot_2.png')
     
     plt.show()
+    
 if __name__ == "__main__":
     run_debug_example_one()
     #intcomp_demo()

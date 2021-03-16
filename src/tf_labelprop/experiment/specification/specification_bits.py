@@ -203,7 +203,7 @@ FILTER_LDST = {
          "tuning_iter_as_pct":[True],
          "constantProp":[False],
          "gradient_fix":[True],
-         "weigh_by_degree":[True]
+         "weigh_by_degree":[True,False]
         }
 
 FILTER_LGC_LVO = {
@@ -246,7 +246,7 @@ Algorithm (that is, Classifier) configs
 """
 ALGORITHM_GTAM_DEFAULT = {
    "algorithm" : ["GTAM"],
-   "weigh_by_degree":[True],
+   "weigh_by_degree":[True,False],
    "mu":[0.001,0.0101,0.1111,9,99.0]  
 }
 
