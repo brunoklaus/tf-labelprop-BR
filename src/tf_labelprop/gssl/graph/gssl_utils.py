@@ -252,9 +252,8 @@ def calc_Z(Y, labeledIndexes,D,estimatedFreq=None,weigh_by_degree=False):
         Y = init_matrix(Y,labeledIndexes)
     np.set_printoptions(formatter={'float': lambda x: "{0:0.3f}".format(x)})
     assert D.shape[0] == Y.shape[0]
-    Z = np.array(Y)
+    Z = np.zeros_like(Y)
     for i in np.where(labeledIndexes == True)[0]:
-        Z[i,:] = 0
         if weigh_by_degree:
             Z[i,np.argmax(Y[i,:])] = D[i]
         else:

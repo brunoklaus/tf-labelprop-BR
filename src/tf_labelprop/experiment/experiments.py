@@ -215,7 +215,7 @@ class ExperimentRun():
 
 def run_debug_example_one(hook_list=[]):
     import tf_labelprop.experiment.specification.exp_chapelle as exp
-    opt = exp.ExpChapelle("digit1").get_all_configs()[0]
+    opt = exp.ExpChapelle("COIL").get_all_configs()[0]
     ExperimentRun(opt).run(hook_list=hook_list)
     
     
@@ -263,7 +263,7 @@ def intcomp_demo():
                 s = spec.INPUT_CHAPELLE_A
                 s["use_chapelle_splits"] = [True]
                 s['num_labeled'] = [10]
-                s['benchmark'] = ['g241c']
+                s['benchmark'] = ['digit1']
             return P(s)
     
         def filterConfig(self):
@@ -304,9 +304,10 @@ def intcomp_demo():
                 
                 s['p'] = [1500 if self.ds == 'isolet' else 50]
                 return P(s)
-            s = spec.ALGORITHM_GTAM_DEFAULT
-            s['mu'] = [(1-0.99)/0.99]
-            
+            s = spec.ALGORITHM_LGC_DEFAULT
+            #s['mu'] = [(1-0.9)/0.9]
+            s['alpha'] = [0.9]
+            s['num_iter'] = [1000.0]
             def alpha_to_mu(alpha):
                 return (1-alpha)/alpha
             s["num_iter"] = [1000]
@@ -388,8 +389,8 @@ def teste_():
     plt.show()
     
 if __name__ == "__main__":
-    run_debug_example_one(W_PLOT_HOOKS_NOITER)
-    #intcomp_demo()
+    #run_debug_example_one([])
+    intcomp_demo()
     #teste()
     
 

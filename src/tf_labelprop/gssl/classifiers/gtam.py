@@ -60,13 +60,12 @@ class GTAMClassifier(GSSLClassifier):
         #Get graph laplacian
         L = gutils.lap_matrix(W, which_lap='sym')
         #Propagation matrix
-        P = np.linalg.inv( I- 1/(1+mu) *(I-L) )*mu/(1+mu)
+        from scipy.linalg import inv as invert
+        P = invert( I- 1/(1+mu) *(I-L) )*mu/(1+mu)
         
         P_t = P.transpose()
         #Matrix A
         A = ((P_t @ L) @ P) + mu* ((P_t - I) @ (P - I))
-        
-
         #A = A + A.transpose()
         
         W = scipy.sparse.coo_matrix(W)
@@ -91,8 +90,10 @@ class GTAMClassifier(GSSLClassifier):
                 Then, we normalize each row so that row sums to its estimated influence
             '''
             ul = np.logical_not(labeledIndexes)
+            
+            Z = gutils.calc_Z(Y, labeledIndexes, D, estimatedFreq,weigh_by_degree=True)
 
-            Z = gutils.calc_Z(Y, labeledIndexes, D, estimatedFreq,weigh_by_degree=self.weigh_by_degree)
+
             if Q is None:
                 #Compute graph gradient
                 Q = np.matmul(A,Z)
@@ -103,9 +104,10 @@ class GTAMClassifier(GSSLClassifier):
                 
             else:
                 Q[id_min_line,:] = np.inf
-                new_el_pct = Z[id_min_line,id_min_col] / np.sum(Z[:,id_min_col])
+                d_sj = np.sum(Z[labeledIndexes,id_min_col])
+                d_sj1 = d_sj + Z[id_min_line,id_min_col]
                 Q[ul,id_min_col] =\
-                 (1 - new_el_pct) * Q[ul,id_min_col] + Z[id_min_line,id_min_col] * A[ul,id_min_line]
+                 (d_sj/(d_sj1) * Q[ul,id_min_col]) + (Z[id_min_line,id_min_col]/d_sj1 * A[ul,id_min_line])
             
             #Find minimum unlabeled index
             

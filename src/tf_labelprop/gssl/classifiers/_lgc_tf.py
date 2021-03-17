@@ -8,7 +8,7 @@ import time
 from scipy import sparse
 
 import numpy as np
-import tensorflow.compat.v1 as tf
+import tensorflow as tf
 from tf_labelprop.gssl.classifiers import GSSLClassifier
 import tf_labelprop.logging.logger as LOG 
 
@@ -16,8 +16,8 @@ import tf_labelprop.logging.logger as LOG
 def get_S_fromtensor(W):
     wsum = tf.sparse.reduce_sum(W,axis=1)
     wsum = tf.reshape(wsum,(-1,))
-    d_sqrt = tf.reciprocal(tf.sqrt(wsum))
-    d_sqrt = tf.where(tf.is_finite(d_sqrt),d_sqrt,tf.ones(shape=tf.shape(d_sqrt)))
+    d_sqrt = tf.math.reciprocal(tf.sqrt(wsum))
+    d_sqrt = tf.where(tf.math.is_finite(d_sqrt),d_sqrt,tf.ones(shape=tf.shape(d_sqrt)))
     
     d_sqrt_i = tf.gather(d_sqrt,W.indices[:,0])
     d_sqrt_j = tf.gather(d_sqrt,W.indices[:,1])
@@ -62,7 +62,7 @@ def row_normalize(x):
         s= tf.cast(tf.shape(x)[1],tf.float32)
         vec = tf.reduce_sum(x,axis=1)
         x = x/repeat(vec,s)
-        x = tf.where(tf.is_finite(x),x,tf.ones(shape=tf.shape(x))/s)
+        x = tf.where(tf.math.is_finite(x),x,tf.ones(shape=tf.shape(x))/s)
         return x
 """ UTIL FUNTIONS END """
 
@@ -75,62 +75,45 @@ def convert_sparse_matrix_to_sparse_tensor(X,var_values=False):
     
 
 def LGC_iter_TF(X,W,Y,labeledIndexes, alpha = 0.1,num_iter = 1000, hook=None):
-    config = tf.ConfigProto()
-    config.gpu_options.per_process_gpu_memory_fraction = 0.5
-    tf.reset_default_graph()
-    with tf.Session(config=config) as sess:
-        
-        """ Set W to sparse if necessary, make copy of Y """
-        W = sparse.csr_matrix(W)        
-        Y = np.copy(Y)
-        
-        """ Convert W to tensor """
-        W = convert_sparse_matrix_to_sparse_tensor(W)
-        LOG.debug(W,LOG.ll.CLASSIFIER)
-        
-        """ Get degree Matrix """
-        D =  tf.sparse.reduce_sum(W,axis=1)
-        
-        
-        """ F_0 is a copy of the label matrix, but we erase the information on labeled Indexes """
-        F_0 = np.copy(Y).astype(np.float32) 
-        F_0[np.logical_not(labeledIndexes),:] = 0.0
-        
-        
-        
-        """
-            CREATE S - Needed for LGC propagation
-        """
-        S =  get_S_fromtensor(W)
-        
-        
-        """
-        CREATE F variable
-        """
-        F = tf.Variable(np.copy(F_0).astype(np.float32),name="F")
-        F_0 = tf.Variable(F_0)
-        TOTAL_ITER = tf.constant(int(num_iter))
-        
-        def _to_dense(sparse_tensor):
-            return tf.sparse_add(tf.zeros(sparse_tensor._dense_shape), sparse_tensor)
-        calc_F = update_F(TOTAL_ITER, alpha, S, F_0)
-        assign_to_F = tf.assign(F,calc_F[1])
-        
-        """
-            Run variable initializers 
-        """
-        global_var_init=tf.global_variables_initializer()
-        local_var_init = tf.local_variables_initializer()
-        sess.run([global_var_init,local_var_init])    
-        
-        c = time.time()
-        sess.run(assign_to_F)
-        elapsed = time.time() - c
-        LOG.info('Label Prop (excluding initialization) done in {:.2} seconds'.format(elapsed),
-                 LOG.ll.CLASSIFIER)
-        
-        result  = F.eval(sess) 
-        sess.close()
-        return result
+    c = time.time()
+    
+    """ Set W to sparse if necessary, make copy of Y """
+    W = sparse.csr_matrix(W)        
+    Y = np.copy(Y)
+    
+    """ Convert W to tensor """
+    W = convert_sparse_matrix_to_sparse_tensor(W)
+    LOG.debug(W,LOG.ll.CLASSIFIER)
+    
+    """ Get degree Matrix """
+    D =  tf.sparse.reduce_sum(W,axis=1)
+    
+    
+    """ F_0 is a copy of the label matrix, but we erase the information on labeled Indexes """
+    F_0 = np.copy(Y).astype(np.float32) 
+    F_0[np.logical_not(labeledIndexes),:] = 0.0
+    
+    
+    
+    """
+        CREATE S - Needed for LGC propagation
+    """
+    S =  get_S_fromtensor(W)
+    
+    
+    """
+    CREATE F variable
+    """
+    F = tf.Variable(np.copy(F_0).astype(np.float32),name="F")
+    F_0 = tf.Variable(F_0)
+    TOTAL_ITER = tf.constant(int(num_iter))
+    for _ in range(num_iter):
+        F = (1-alpha)*F_0 + alpha*tf.sparse.sparse_dense_matmul(S,F)
+    
+    elapsed = time.time() - c
+    LOG.info('Label Prop done in {:.2} seconds'.format(elapsed),
+             LOG.ll.CLASSIFIER)
+    
+    return F.numpy()
 
 
