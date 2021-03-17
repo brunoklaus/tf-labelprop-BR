@@ -28,7 +28,7 @@ class GTAMClassifier(GSSLClassifier):
              constant_prop=False,hook=None):
         '''BEGIN initialization'''
         Y = self.CLEAN_UNLABELED_ROWS(Y, labeledIndexes)
-        
+        labeledIndexes = np.array(labeledIndexes)
 
         
         if not W.shape[0] == Y.shape[0]:
@@ -39,10 +39,17 @@ class GTAMClassifier(GSSLClassifier):
         num_classes = Y.shape[1]
         
         
+        
         """ Estimate frequency of classes"""
         if not useEstimatedFreq is None:
                 if isinstance(useEstimatedFreq,bool):
-                    estimatedFreq = np.sum(Y[labeledIndexes],axis=0) / num_labeled
+                    if useEstimatedFreq == True:
+                        if self.know_true_freq:
+                            estimatedFreq = np.sum(Y[labeledIndexes],axis=0) / num_labeled
+                        else:
+                            estimatedFreq = np.sum(Y,axis=0) / Y.shape[0]
+                    else:
+                        estimatedFreq = np.repeat(1/num_classes,num_classes)
                 else:
                     estimatedFreq = useEstimatedFreq
                     
@@ -140,7 +147,10 @@ class GTAMClassifier(GSSLClassifier):
                            id_min_line=id_min_line,id_min_col=id_min_col)
         '''END iterations'''    
         ######################################################################################################
-        
+        if self.return_labels:
+            return np.asarray(Z)
+        else:
+            return np.asarray(P@Z)
         return np.asarray(P@Z)
     
     def fit (self,X,W,Y,labeledIndexes, hook=None):
@@ -153,7 +163,8 @@ class GTAMClassifier(GSSLClassifier):
                            ))
 
 
-    def __init__(self, mu = 99.0,num_iter=None,useEstimatedFreq=True,constantProp=False,know_true_freq=True,weigh_by_degree=False):
+    def __init__(self, mu = 99.0,num_iter=None,useEstimatedFreq=True,constantProp=False,know_true_freq=True,weigh_by_degree=False,
+                 return_labels=False):
         """" Constructor for GTAMClassifier classifier.
         
         Args:
@@ -167,6 +178,7 @@ class GTAMClassifier(GSSLClassifier):
                     
             
         """
+        self.return_labels = return_labels
         self.mu = mu
         self.num_iter = num_iter
         self.useEstimatedFreq = useEstimatedFreq

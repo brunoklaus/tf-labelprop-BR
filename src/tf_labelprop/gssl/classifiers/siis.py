@@ -69,7 +69,6 @@ class SIISClassifier(GSSLClassifier):
         
         c = Y.shape[1]
         
-        W = scipy.sparse.csr_matrix(W) / np.mean(W.data)
 
         
         
@@ -78,7 +77,7 @@ class SIISClassifier(GSSLClassifier):
         
         L = gutils.lap_matrix(W,  which_lap='sym')
         
-        U, SIGMA = gutils.extract_lap_eigvec(L,m,remove_first_eig=True)
+        U, SIGMA = W.load_eigenfunctions(m=m,remove_first_eig=False)
         
         U = scipy.sparse.csr_matrix(U)
         SIGMA =  _to_np(scipy.sparse.diags([SIGMA],[0]))
@@ -230,6 +229,7 @@ class SIISClassifier(GSSLClassifier):
         self.alpha = alpha
         self.rho = rho
         self.max_iter = max_iter
+        
         
         
 if __name__ == "__main__":

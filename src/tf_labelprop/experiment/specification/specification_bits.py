@@ -291,9 +291,10 @@ ALGORITHM_RF_DEFAULT = {
 
 ALGORITHM_GTAM_DEFAULT = {
    "algorithm" : ["GTAM"],
-   "mu" : [0.1111,0.001,9,99],
+   "mu" : [0.1111,0.001,9,99,1],
    "constantProp":[False],   
-    "know_estimated_freq":[True]
+    "know_estimated_freq":[False],
+    "use_estimated_freq":[True,False],
 }
 
 

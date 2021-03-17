@@ -121,8 +121,6 @@ def tex_table(df,y_vars,t_vars,vdiv_vars,hdiv_vars,c_vars,use_std,OUT_FOLDER,dct
         if not osp.isdir(OUT_FOLDER):
             os.makedirs(OUT_FOLDER)
         with open(osp.join(OUT_FOLDER,'table.txt'), "w") as _tex:
-            _tex.write("%\\usepackage{tabularx}\n")
-            _tex.write("%\\usepackage{booktabs}\n")
             _tex.write("\\begin{table}[h] \\tiny")
             
             df[:] = df[:].fillna('---')
@@ -190,18 +188,50 @@ def tex_table(df,y_vars,t_vars,vdiv_vars,hdiv_vars,c_vars,use_std,OUT_FOLDER,dct
                 oldh_df = h_df
                 
                 def _apply(h_df,out_var):
-                    maxval = np.argmax(h_df[out_var].values,axis=0)
+                    def is_number(x):
+                        try:
+                            x = float(x)
+                        except:
+                            return False
+                        return True
+                    def as_number(x):
+                        try:
+                            x = float(x)
+                        except:
+                            return 0.0
+                        return x
+                    b = np.where([is_number(x) for x in h_df[out_var]])[0]
+                    if b.shape[0] > 0:
+                        maxval = np.argmax([as_number(x) for x in h_df[out_var]],axis=0)
+                    else:
+                        maxval = -1
                     y = out_var
-                    h_df[out_var] = [str(x) for x in np.round(100*h_df[out_var],2)]
+                    if isinstance(out_var,str):
+                        out_var = [out_var]
+                    def check_number(x):
+                        try:
+                            x = np.round(100*float(x),2) 
+                        except:
+                            x = x
+                            #print(x)
+                        return x
+                    out_var_r = [check_number(x) for x in h_df[out_var].values]
+
+                    h_df[out_var] = out_var_r
                     if y.endswith('_mean'):
                         old_y = y
                         y = y[:-len('_mean')]
                         y = y+'_sd'
                         #print(list(zip(h_df[old_y].values,h_df.loc[:,y].values)))
+                        
                         def f(x):
-                            return "$\\mathbf{"+ x[0] + " \\pm " + str(np.round(100*x[1],2)) + "}$"
+                            return "$\\mathbf{"+ str(x[0]) + " \\pm " + str(check_number(x[1])) + "}$"
                         def g(x):
-                            return "$" + x[0] + " \\pm " + str(np.round(100*x[1],2)) + "$" 
+                            return "$" + str(x[0]) + " \\pm " + str(check_number(x[1]))+ "$"
+                        print("==================")
+                        print(h_df[old_y].values)
+                        print(h_df[y].values)
+                        print([f(x) if j == maxval   else f(x)  for j,x in enumerate(zip(h_df[old_y].values,h_df[y].values))])
                         h_df[old_y] = [f(x) if j == maxval   else g(x)  for j,x in enumerate(zip(h_df[old_y].values,h_df[y].values))]
                         
                             
@@ -591,9 +621,12 @@ def create_visualization(FOLDER=CSV_FOLDER,OUT_FOLDER=VIS_FOLDER):
 if __name__ == "__main__":
     from io import StringIO
     import sys
-    
-    s = StringIO('\n'.join(['1,2','digit','2','out_acc_labeled_mean,out_acc_unlabeled_mean','y','input_dataset','c','h','i']))
-    #sys.stdin = s 
+    """
+    s = StringIO('\n'.join(['0,1,2,3,4','exp_siis_unlabeled','2','out_acc_mean',
+                            'y',
+                            'noise_corruption_level']+list('igiciichiccci')))
+    sys.stdin = s 
+    """
     create_visualization()
     sys.stdin = sys.__stdin__ 
     
