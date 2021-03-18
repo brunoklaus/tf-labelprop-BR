@@ -151,7 +151,7 @@ class CLGC_Classifier(GSSLClassifier):
         else:
             return(self.__LGC_iter_TF(X,W, Y, labeledIndexes, self.alpha, self.useEstimatedFreq, self.num_iter, hook))
     
-    def __init__(self, alpha = 0.1, num_iter = None, useEstimatedFreq=True):
+    def __init__(self, alpha = 0.1, num_iter = None, use_estimated_freq=True):
         """ Constructor for the LGC classifier.
             
             Args:
@@ -160,4 +160,4 @@ class CLGC_Classifier(GSSLClassifier):
         """
         self.alpha = alpha
         self.num_iter = num_iter
-        self.useEstimatedFreq = useEstimatedFreq
+        self.useEstimatedFreq = use_estimated_freq

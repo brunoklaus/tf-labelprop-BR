@@ -270,7 +270,7 @@ ALGORITHM_LGC_DEFAULT = {
 
 ALGORITHM_CLGC_DEFAULT = {
    "algorithm" : ["CLGC"],
-   "useEstimatedFreq" : [True],
+   "use_estimated_freq" : [True,False],
    "alpha" : [0.9,0.99,0.1,0.999]  
 }
 

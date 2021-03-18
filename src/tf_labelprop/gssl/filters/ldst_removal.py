@@ -18,50 +18,44 @@ class LDSTRemover(GSSLFilter):
     @GSSLFilter.autohooks
     def LDST(self,X,W,Y,labeledIndexes,mu = 99.0,useEstimatedFreq=True,tuning_iter = 0,hook=None,
              constant_prop = False,useZ=True):
-        '''BEGIN initialization'''
-        Y = np.copy(Y)
-        #We make a deep copy of labeledindexes
+        Y = self.CLEAN_UNLABELED_ROWS(Y, labeledIndexes)
         labeledIndexes = np.array(labeledIndexes)
+
         
-        if Y.ndim == 1:
-            Y = gutils.init_matrix(Y,labeledIndexes)
-        Y[np.logical_not(labeledIndexes),:] = 0
-           
         if not W.shape[0] == Y.shape[0]:
             raise ValueError("W,Y shape not compatible")
-
-        W = 0.5*(W + W.transpose())
-
         
         num_labeled = Y[labeledIndexes].shape[0]
         num_unlabeled = Y.shape[0] - num_labeled
         num_classes = Y.shape[1]
         
-        D = gutils.deg_matrix(W,flat=True)
-        """ Estimate frequency of classes"""
-        if not useEstimatedFreq is None:
-                if isinstance(useEstimatedFreq,bool):
-                    estimatedFreq = np.sum(Y[labeledIndexes],axis=0) / num_labeled
-                else:
-                    estimatedFreq = useEstimatedFreq
-                    
-        else:
-            estimatedFreq = np.repeat(1/num_classes,num_classes)
         
+        
+        """ Estimate frequency of classes"""
+        if isinstance(useEstimatedFreq,bool):
+            if useEstimatedFreq == False:
+                estimatedFreq = np.repeat(1/num_classes,num_classes)
+            elif useEstimatedFreq == True:
+                estimatedFreq = np.sum(Y[labeledIndexes],axis=0) / num_labeled
+            
+            
+            
+        D = gutils.deg_matrix(W, flat=True)
         #Identity matrix
         I = np.identity(W.shape[0])
         #Get graph laplacian
-        L = gutils.lap_matrix(W,  which_lap='sym')
+        L = gutils.lap_matrix(W, which_lap='sym')
         #Propagation matrix
-        """ !!!!!! """
-        P = np.linalg.inv( I + 0.5*(L + L.transpose())/mu )
-        #P = np.zeros(W.shape)
-        #P[np.ix_(labeledIndexes,labeledIndexes)] = np.linalg.inv( I + 0.5*(L + L.transpose())/mu )[np.ix_(labeledIndexes,labeledIndexes)] 
-            
+        from scipy.linalg import inv as invert
+        P = invert( I- 1/(1+mu) *(I-L) )*mu/(1+mu)
+        
         P_t = P.transpose()
         #Matrix A
-        A = ((P_t @ L) @ P) + mu*((P_t - I) @ (P - I))
-        
+        A = ((P_t @ L) @ P) + mu* ((P_t - I) @ (P - I))
+        A = 0.5*(A + A.transpose())
+        import scipy.sparse
+        if not hook is None:
+            W = scipy.sparse.coo_matrix(W)
         Z = []
         
         #######################################################################################
@@ -144,7 +138,7 @@ class LDSTRemover(GSSLFilter):
         return self.LDST(X, W, Y, labeledIndexes, self.mu, self.useEstimatedFreq, tuning_iter,\
                           hook, self.constantProp,self.useZ)
     
-    def __init__(self, tuning_iter,mu = 99.0, useEstimatedFreq=True,constantProp=False,useZ=True,
+    def __init__(self, tuning_iter,mu = 99.0, use_estimated_freq=True,constantProp=False,useZ=True,
                  tuning_iter_as_pct=False,know_true_freq=False,weigh_by_degree=True,gradient_fix=True):
         """ Constructor for LDST-Removal Filter.
         
@@ -172,7 +166,7 @@ class LDSTRemover(GSSLFilter):
         """
         self.mu = mu
         self.tuning_iter = tuning_iter
-        self.useEstimatedFreq = useEstimatedFreq
+        self.useEstimatedFreq = use_estimated_freq
         self.constantProp = constantProp
         self.useZ = useZ
         self.tuning_iter_as_pct = tuning_iter_as_pct

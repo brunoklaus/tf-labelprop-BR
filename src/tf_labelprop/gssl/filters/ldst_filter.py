@@ -17,15 +17,11 @@ class LDST(GSSLFilter):
     def LDST(self,X,W,Y,labeledIndexes,mu = 99.0,useEstimatedFreq=True,tuning_iter = 0,hook=None,
              constant_prop = False,useZ=False,weigh_by_degree=False):
         '''BEGIN initialization'''
-        
-        Y = np.copy(Y)
-        #We make a deep copy of labeledindexes
+        '''BEGIN initialization'''
+        Y = self.CLEAN_UNLABELED_ROWS(Y, labeledIndexes)
         labeledIndexes = np.array(labeledIndexes)
+
         
-        if Y.ndim == 1:
-            Y = gutils.init_matrix(Y,labeledIndexes)
-        Y[np.logical_not(labeledIndexes),:] = 0
-           
         if not W.shape[0] == Y.shape[0]:
             raise ValueError("W,Y shape not compatible")
         
@@ -33,25 +29,35 @@ class LDST(GSSLFilter):
         num_unlabeled = Y.shape[0] - num_labeled
         num_classes = Y.shape[1]
         
-        D = np.sum(W,axis=0)
-        if useEstimatedFreq:
-            estimatedFreq = np.sum(Y[labeledIndexes],axis=0) / num_labeled
-        else:
-            estimatedFreq = np.repeat(1/num_classes,num_classes)
+        
+        
+        """ Estimate frequency of classes"""
+        if isinstance(useEstimatedFreq,bool):
+            if useEstimatedFreq == False:
+                estimatedFreq = np.repeat(1/num_classes,num_classes)
+            elif useEstimatedFreq == True:
+                estimatedFreq = np.sum(Y[labeledIndexes],axis=0) / num_labeled
             
             
+            
+        D = gutils.deg_matrix(W, flat=True)
         #Identity matrix
         I = np.identity(W.shape[0])
         #Get graph laplacian
         L = gutils.lap_matrix(W, which_lap='sym')
         #Propagation matrix
-        P = np.linalg.inv( I + 0.5*(L + L.transpose())/mu )
+        from scipy.linalg import inv as invert
+        P = invert( I- 1/(1+mu) *(I-L) )*mu/(1+mu)
+        
         P_t = P.transpose()
         #Matrix A
-        A = ((P_t @ L) @ P) + mu*((P_t - I) @ (P - I))
-        A = A + A.transpose()
-        
+        A = ((P_t @ L) @ P) + mu* ((P_t - I) @ (P - I))
+        A = 0.5*(A + A.transpose())
+        import scipy.sparse
+        if not hook is None:
+            W = scipy.sparse.coo_matrix(W)
         Z = []
+        
         
         #######################################################################################
         '''BEGIN iterations'''
@@ -125,7 +131,7 @@ class LDST(GSSLFilter):
         return self.LDST(X, W, Y, labeledIndexes, self.mu, self.useEstimatedFreq, tuning_iter, hook, \
                          self.constantProp,self.useZ,self.weigh_by_degree)
     
-    def __init__(self, tuning_iter,mu = 99.0, useEstimatedFreq=True,constantProp=False,useZ=True,
+    def __init__(self, tuning_iter,mu = 99.0, use_estimated_freq=True,constantProp=False,useZ=True,
                  weigh_by_degree=False):
         """" Constructor for the LDST filter.
         
@@ -147,7 +153,7 @@ class LDST(GSSLFilter):
             """
         self.mu = mu
         self.tuning_iter = tuning_iter
-        self.useEstimatedFreq = useEstimatedFreq
+        self.useEstimatedFreq = use_estimated_freq
         self.constantProp = constantProp
         self.useZ = useZ
         self.weigh_by_degree = weigh_by_degree

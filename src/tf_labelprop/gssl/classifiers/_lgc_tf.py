@@ -29,21 +29,6 @@ def get_S_fromtensor(W):
     
     return S
 
-def update_F(TOTAL_ITER,ALPHA,S,F_0):
-    i = tf.constant(0)
-    c = lambda i,F: tf.less(i, TOTAL_ITER)
-    b = lambda i,F: (tf.add(i, 1),(1 - ALPHA)*F_0 + ALPHA*tf.sparse.matmul(S,F))
-    r = tf.while_loop(c, b, [i,F_0])
-    return r
-            
-def get_P(TOTAL_ITER,ALPHA,S,F_0):
-    i = tf.constant(0)
-    c = lambda i,F: tf.less(i, TOTAL_ITER)
-    b = lambda i,F: (tf.add(i, 1),(1 - ALPHA)*F_0 + ALPHA*tf.sparse.matmul(S,F))
-    r = tf.while_loop(c, b, [i,F_0])
-    return r
-
-
 
 """ UTIL FUNCTIONS BEGIN """
 def gather(x,F):

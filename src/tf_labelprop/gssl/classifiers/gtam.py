@@ -41,25 +41,15 @@ class GTAMClassifier(GSSLClassifier):
         
         
         """ Estimate frequency of classes"""
-        if not useEstimatedFreq is None:
-                if isinstance(useEstimatedFreq,bool):
-                    if useEstimatedFreq == True:
-                        if self.know_true_freq:
-                            estimatedFreq = np.sum(Y[labeledIndexes],axis=0) / num_labeled
-                        else:
-                            estimatedFreq = np.sum(Y,axis=0) / Y.shape[0]
-                    else:
-                        estimatedFreq = np.repeat(1/num_classes,num_classes)
-                else:
-                    estimatedFreq = useEstimatedFreq
-                    
-        else:
-            estimatedFreq = np.repeat(1/num_classes,num_classes)
+        if isinstance(useEstimatedFreq,bool):
+            if useEstimatedFreq == False:
+                estimatedFreq = np.repeat(1/num_classes,num_classes)
+            elif useEstimatedFreq == True:
+                estimatedFreq = np.sum(Y[labeledIndexes],axis=0) / num_labeled
         LOG.debug("Estimated frequency: {}".format(estimatedFreq),LOG.ll.CLASSIFIER)
 
         
-        """ IMPORTANT! ERASES LABELS """        
-        Y[np.logical_not(labeledIndexes),:] = 0
+        
         
         D = gutils.deg_matrix(W, flat=True)
         #Identity matrix
@@ -73,11 +63,12 @@ class GTAMClassifier(GSSLClassifier):
         P_t = P.transpose()
         #Matrix A
         A = ((P_t @ L) @ P) + mu* ((P_t - I) @ (P - I))
-        #A = A + A.transpose()
+        A = 0.5*(A + A.transpose())
         
-        W = scipy.sparse.coo_matrix(W)
+        if not hook is None:
+            W = scipy.sparse.coo_matrix(W)
+        
         Z = []
-        
         Q = None
         
         
@@ -163,7 +154,7 @@ class GTAMClassifier(GSSLClassifier):
                            ))
 
 
-    def __init__(self, mu = 99.0,num_iter=None,useEstimatedFreq=True,constantProp=False,know_true_freq=True,weigh_by_degree=False,
+    def __init__(self, mu = 99.0,num_iter=None,use_estimated_freq=True,constantProp=False,know_true_freq=True,weigh_by_degree=False,
                  return_labels=False):
         """" Constructor for GTAMClassifier classifier.
         
@@ -181,7 +172,7 @@ class GTAMClassifier(GSSLClassifier):
         self.return_labels = return_labels
         self.mu = mu
         self.num_iter = num_iter
-        self.useEstimatedFreq = useEstimatedFreq
+        self.useEstimatedFreq = use_estimated_freq
         self.constantProp = constantProp
         self.know_true_freq = know_true_freq
         self.weigh_by_degree = weigh_by_degree
