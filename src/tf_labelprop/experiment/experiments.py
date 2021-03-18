@@ -132,12 +132,15 @@ class ExperimentRun():
         
         
         if "know_estimated_freq" in mplex["ALG"].keys():
-            mplex["ALG"]["useEstimatedFreq"] = np.sum(self.Y_true,axis=0) / self.Y_true.shape[0]
+            if mplex["ALG"]['know_estimated_freq']:
+                mplex["ALG"]["use_estimated_freq"] = np.sum(self.Y_true,axis=0) / self.Y_true.shape[0]
             mplex["ALG"].pop("know_estimated_freq")
-        
+            
         if "know_estimated_freq" in mplex["FILTER"].keys():
-            mplex["FILTER"]["useEstimatedFreq"] = np.sum(self.Y_true,axis=0) / self.Y_true.shape[0]
+            if mplex["ALG"]['know_estimated_freq']:
+                mplex["FILTER"]["use_estimated_freq"] = np.sum(self.Y_true,axis=0) / self.Y_true.shape[0]
             mplex["FILTER"].pop("know_estimated_freq")
+            
             
         
         
@@ -304,13 +307,14 @@ def intcomp_demo():
                 
                 s['p'] = [1500 if self.ds == 'isolet' else 50]
                 return P(s)
-            s = spec.ALGORITHM_LGC_DEFAULT
+            s = spec.ALGORITHM_SIIS_DEFAULT
+            s['m'] = [100]
             #s['mu'] = [(1-0.9)/0.9]
-            s['alpha'] = [0.9]
-            s['num_iter'] = [1000.0]
+            #s['alpha'] = [0.9]
+            #s['num_iter'] = [1000.0]
             def alpha_to_mu(alpha):
                 return (1-alpha)/alpha
-            s["num_iter"] = [1000]
+            #s["num_iter"] = [1000]
             return P(s)
     
 
@@ -390,9 +394,38 @@ def teste_():
     
 if __name__ == "__main__":
     #run_debug_example_one([])
-    intcomp_demo()
+    #intcomp_demo()
     #teste()
-    
+    #raise ""
+    from tf_labelprop.logging.logger import _LOG
+    import logging
+    #_LOG.setLevel(logging.ERROR)
+
+    import tf_labelprop.experiment.specification.specification_bits as spec
+    from tf_labelprop.experiment.specification.specification_bits import allPermutations as P
+    from tf_labelprop.experiment.specification.exp_chapelle import ExpChapelle
+
+    class ExpChapelleColab(ExpChapelle):
+        def get_spec_name(self):
+            return "Experiment_Chapelle_{}_labels={}_split={}_alg=gtam_label".format(self.ds,self.num_labeled,self.use_chapelle_splits)
+        def algConfig(self):
+            s = spec.ALGORITHM_GTAM_DEFAULT
+            s["use_estimated_freq"]=[True,False]
+            """
+            s['max_iter'] = [200]
+            s['alpha'] = [1,10,100,1000]
+            s['beta'] = [1,10,100,1000]
+            s['m'] = [200]
+            """
+            return P(s)
+        def noiseConfig(self):
+            s = spec.NOISE_UNIFORM_DET_SOME
+            return P(s)
+    for ds in ["digit1","COIL", "COIL2", "g241c", "g241n", "USPS","BCI"]:
+        ExpChapelleColab(ds=[ds],use_chapelle_splits=True).run_all()
+    #%cp -av /content/tf_labelprop/results -t /content/gdrive/MyDrive/tf_labelprop_br
+
+
 
     
     
